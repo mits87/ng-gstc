@@ -14,7 +14,15 @@
     "lib": [
       "es2018",
       "dom"
-    ]
+    ],
+    "paths": {
+      "ng-gstc": [
+        "dist/ng-gstc"
+      ],
+      "ng-gstc/*": [
+        "dist/ng-gstc/*"
+      ]
+    }
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,
