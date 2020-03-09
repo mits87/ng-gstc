@@ -135,6 +135,7 @@
           "options": {
             "tsConfig": "projects/ng-gstc/tsconfig.lib.json",
             "project": "projects/ng-gstc/ng-package.json"
+
           },
           "configurations": {
             "production": {
