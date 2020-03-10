@@ -22,7 +22,7 @@ export class AppComponent implements OnInit {
       const id = i.toString();
       rows[id] = {
         id,
-        label: "Room " + i,
+        label: 'Room ' + i,
         parentId: withParent ? (i - 1).toString() : undefined,
         expanded: false
       };
@@ -38,7 +38,7 @@ export class AppComponent implements OnInit {
       const start = new Date().getTime();
       items[id] = {
         id,
-        label: "User id " + i,
+        label: 'User id ' + i,
         time: {
           start: start + i * dayLen,
           end: start + (i + 2) * dayLen
@@ -56,14 +56,14 @@ export class AppComponent implements OnInit {
       },
       data: {
         label: {
-          id: "label",
-          data: "label",
+          id: 'label',
+          data: 'label',
           expander: true,
           isHtml: true,
           width: 230,
           minWidth: 100,
           header: {
-            content: "Room"
+            content: 'Room'
           }
         }
       }
@@ -88,18 +88,18 @@ export class AppComponent implements OnInit {
 
     // YOU CAN SUBSCRIBE TO CHANGES
 
-    this.gstcState.subscribe("config.list.rows", rows => {
-      console.log("rows changed", rows);
+    this.gstcState.subscribe('config.list.rows', rows => {
+      console.log('rows changed', rows);
     });
 
     this.gstcState.subscribe(
-      "config.chart.items.:id",
+      'config.chart.items.:id',
       (bulk, eventInfo) => {
-        if (eventInfo.type === "update" && eventInfo.params.id) {
+        if (eventInfo.type === 'update' && eventInfo.params.id) {
           const itemId = eventInfo.params.id;
           console.log(
             `item ${itemId} changed`,
-            this.gstcState.get("config.chart.items." + itemId)
+            this.gstcState.get('config.chart.items.' + itemId)
           );
         }
       },
