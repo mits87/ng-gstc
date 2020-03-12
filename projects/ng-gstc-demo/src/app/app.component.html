@@ -1,3 +1,3 @@
 <div>
-  <ng-gstc [height]="config.height" [list]="config.list" [chart]="config.chart"></ng-gstc>
+  <ng-gstc [height]="config.height" [list]="config.list" [chart]="config.chart" (listChange)="listChange($event)" [customEventHandlers]="events"></ng-gstc>
 </div>

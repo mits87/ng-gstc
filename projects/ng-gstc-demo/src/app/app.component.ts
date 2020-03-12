@@ -11,6 +11,13 @@ export class AppComponent implements OnInit {
   config: any;
   gstcState: any;
 
+  events = [
+    {
+      event: 'config.list.rows.:id',
+      handler: this.onRowChange
+    }
+  ];
+
   ngOnInit() {
     const iterations = 20;
 
@@ -79,6 +86,12 @@ export class AppComponent implements OnInit {
         items
       }
     };
+
+
+    setTimeout(() => {
+      this.config.list.rows[1].label = 'ROOOOW CHANGED';
+      this.config.list = { ...this.config.list };
+    }, 4000);
   }
 
   // GET THE GANTT INTERNAL STATE
@@ -105,5 +118,13 @@ export class AppComponent implements OnInit {
       },
       { bulk: true }
     );
+  }
+
+  listChange($event: any) {
+    console.log('listChange', $event);
+  }
+
+  onRowChange(arg) {
+    console.log(arg);
   }
 }
