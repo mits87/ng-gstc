@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-root',
@@ -13,7 +13,7 @@ export class AppComponent implements OnInit {
 
   events = [
     {
-      event: 'config.list.rows.:id',
+      event: 'config.list.rows',
       handler: this.onRowChange
     }
   ];

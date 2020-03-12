@@ -70,21 +70,21 @@ export class NgGstcComponent implements AfterViewInit, OnChanges, OnDestroy {
   private state: any;
 
   private props = [
-    { key: 'plugins' },
-    { key: 'plugin' },
-    { key: 'height' },
-    { key: 'headerHeight' },
-    { key: 'components' },
-    { key: 'wrappers' },
-    { key: 'slots' },
-    { key: 'list' },
-    { key: 'scroll' },
-    { key: 'chart' },
-    { key: 'classNames' },
-    { key: 'actions' },
-    { key: 'locale' },
-    { key: 'utcMode' },
-    { key: 'usageStatistics' },
+    'plugins',
+    'plugin',
+    'height',
+    'headerHeight',
+    'components',
+    'wrappers',
+    'slots',
+    'list',
+    'scroll',
+    'chart',
+    'classNames',
+    'actions',
+    'locale',
+    'utcMode',
+    'usageStatistics',
   ];
 
   constructor() { }
@@ -114,7 +114,7 @@ export class NgGstcComponent implements AfterViewInit, OnChanges, OnDestroy {
   private getConfig(): Config {
     return this.props
       .reduce(
-        (config, { key }) => {
+        (config, key) => {
           if (this[key] !== undefined) {
             config[key] = this[key];
           }
@@ -125,7 +125,7 @@ export class NgGstcComponent implements AfterViewInit, OnChanges, OnDestroy {
   }
 
   private initEventListeners() {
-    this.props.forEach(({ key }) => {
+    this.props.forEach((key) => {
       const action = `${key}Change`;
       if (this[action] && this[action] instanceof EventEmitter) {
         this.state.subscribe(`config.${key}`, entry => this[action].emit(entry));
