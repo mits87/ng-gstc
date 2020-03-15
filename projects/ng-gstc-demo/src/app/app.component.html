@@ -1,3 +1,14 @@
 <div>
-  <ng-gstc [height]="config.height" [list]="config.list" [chart]="config.chart" (listChange)="listChange($event)" [customEventHandlers]="events"></ng-gstc>
+  <ng-gstc
+    [height]="config.height"
+    [list]="config.list"
+    [chart]="config.chart"
+    (listChange)="listChange($event)"
+    (itemClick)="itemClick($event)"
+    [customEventHandlers]="events"
+  ></ng-gstc>
+</div>
+
+<div>
+  <button (click)="addItem()">Add Random Item</button>
 </div>

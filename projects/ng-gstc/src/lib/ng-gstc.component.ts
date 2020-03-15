@@ -23,11 +23,7 @@ import {
   Wrappers
 } from 'gantt-schedule-timeline-calendar';
 import GSTC from 'gantt-schedule-timeline-calendar/dist/index.esm';
-
-interface Handler {
-  event: string;
-  handler: (...args) => any;
-}
+import { Handler } from './ng-gstc';
 
 @Component({
   selector: 'ng-gstc',
@@ -47,7 +43,7 @@ export class NgGstcComponent implements AfterViewInit, OnChanges, OnDestroy {
   @Input() scroll: Scroll;
   @Input() chart: Chart;
   @Input() classNames: ClassNames;
-  @Input() actions: Actions;
+  @Input() actions: Actions = {} as Actions;
   @Input() locale: Locale;
   @Input() utcMode: boolean;
   @Input() usageStatistics: boolean;
@@ -63,6 +59,8 @@ export class NgGstcComponent implements AfterViewInit, OnChanges, OnDestroy {
   @Output() chartChange: EventEmitter<any> = new EventEmitter();
   @Output() classNamesChange: EventEmitter<any> = new EventEmitter();
   @Output() actionsChange: EventEmitter<any> = new EventEmitter();
+
+  @Output() itemClick: EventEmitter<any> = new EventEmitter();
 
   @ViewChild('gstc', { static: true }) calendarEl: ElementRef;
 
@@ -111,6 +109,33 @@ export class NgGstcComponent implements AfterViewInit, OnChanges, OnDestroy {
     this.gstc.app.destroy();
   }
 
+  addAction(source: string, event: string, handler: (event: any, data: any) => any) {
+    function action(element, data) {
+      const listener = (e) => handler(e, data);
+
+      element.addEventListener(event, listener);
+
+      return {
+        update(el: HTMLElement, newData) {
+          data = newData; // data from parent scope updated
+        },
+        destroy(el: HTMLElement) {
+          el.removeEventListener(event, listener);
+        }
+      };
+    }
+
+    if (!this.actions) {
+      this.actions = {} as Actions;
+    }
+
+    if (this.actions[source]) {
+      return this.actions[source].push(action);
+    }
+
+    this.actions[source] = [ action ];
+  }
+
   private getConfig(): Config {
     return this.props
       .reduce(
@@ -140,6 +165,7 @@ export class NgGstcComponent implements AfterViewInit, OnChanges, OnDestroy {
   }
 
   private init() {
+    this.addAction('chart-timeline-items-row-item', 'click', (event, data) => this.itemClick.emit({ event, data }));
     const config: Config = this.getConfig();
 
     const element = this.calendarEl.nativeElement;

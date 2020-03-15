@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Handler } from 'ng-gstc';
 
 @Component({
   selector: 'app-root',
@@ -11,7 +12,7 @@ export class AppComponent implements OnInit {
   config: any;
   gstcState: any;
 
-  events = [
+  events: Handler[] = [
     {
       event: 'config.list.rows',
       handler: this.onRowChange
@@ -120,11 +121,36 @@ export class AppComponent implements OnInit {
     );
   }
 
+  addItem() {
+    const id = Math.floor(Math.random() * 10000000).toString();
+    const dayLen = 24 * 60 * 60 * 1000;
+    const start = new Date().getTime();
+    this.config.chart = {
+      ...this.config.chart,
+      items: {
+        ...this.config.chart.items,
+        [id]: {
+          id,
+          label: 'User id ' + id,
+          time: {
+            start: start + 3 * dayLen,
+            end: start + 5 * dayLen
+          },
+          rowId: Math.floor(Math.random() * 20).toString()
+        }
+      }
+    };
+  }
+
   listChange($event: any) {
     console.log('listChange', $event);
   }
 
   onRowChange(arg) {
     console.log(arg);
+  }
+
+  itemClick($event: any) {
+    console.log('itemClick', $event);
   }
 }
