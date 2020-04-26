@@ -1,5 +1,95 @@
 import { Component, OnInit } from '@angular/core';
 import { Handler } from 'ng-gstc';
+declare const dayjs;
+// const dayjs = require('dayjs');
+
+
+const MOCKED_DATA = [
+  {
+    id: 1,
+    name: 'Double Room',
+    meta: [
+      [1, 2, 3, null, 4, 5, 10, null],
+      [null, '-', null],
+    ],
+    units: [
+      {
+        id: 1,
+        name: 'Unit 1',
+      },
+      {
+        id: 2,
+        name: 'Unit 2',
+        bookings: [
+          {
+            id: 1,
+            name: 'Tam Marston / 280,00 EUR',
+            from: dayjs().startOf('month').add(1, 'day').add(12, 'hour').valueOf(),
+            to: dayjs().startOf('month').add(10, 'day').add(12, 'hour').valueOf(),
+            color: '#84E3DC',
+          },
+          {
+            id: 2,
+            name: 'John Doe / 300,00 EUR',
+            from: dayjs().startOf('month').add(12, 'day').add(12, 'hour').valueOf(),
+            to: dayjs().startOf('month').add(18, 'day').add(12, 'hour').valueOf(),
+            color: '#A0F0CC',
+          },
+        ]
+      },
+      {
+        id: 3,
+        name: 'Unit 3',
+      },
+    ],
+  },
+  {
+    id: 2,
+    name: 'One Bedroom',
+    meta: [],
+    units: [
+      {
+        id: 4,
+        name: 'Unit 4',
+      },
+      {
+        id: 5,
+        name: 'Unit 5',
+      },
+      {
+        id: 6,
+        name: 'Unit 6',
+      },
+    ],
+  },
+  {
+    id: 3,
+    name: 'Two Bedroom',
+    meta: [],
+    units: [
+      {
+        id: 7,
+        name: 'Unit 7',
+        bookings: [
+          {
+            id: 123,
+            name: 'Tam Marston / 280,00 EUR',
+            from: dayjs().startOf('month').add(1, 'day').add(12, 'hour').valueOf(),
+            to: dayjs().startOf('month').add(4, 'day').add(12, 'hour').valueOf(),
+          }
+        ]
+      },
+      {
+        id: 8,
+        name: 'Unit 8',
+      },
+      {
+        id: 9,
+        name: 'Unit 9',
+      },
+    ],
+  },
+];
 
 @Component({
   selector: 'app-root',
@@ -24,36 +114,7 @@ export class AppComponent implements OnInit {
 
     // GENERATE SOME ROWS
 
-    const rows = {};
-    for (let i = 0; i < iterations; i++) {
-      const withParent = i > 0 && i % 2 === 0;
-      const id = i.toString();
-      rows[id] = {
-        id,
-        label: 'Room ' + i,
-        parentId: withParent ? (i - 1).toString() : undefined,
-        expanded: false
-      };
-    }
-
-    const dayLen = 24 * 60 * 60 * 1000;
-
-    // GENERATE SOME ROW -> ITEMS
-
-    const items = {};
-    for (let i = 0; i < iterations; i++) {
-      const id = i.toString();
-      const start = new Date().getTime();
-      items[id] = {
-        id,
-        label: 'User id ' + i,
-        time: {
-          start: start + i * dayLen,
-          end: start + (i + 2) * dayLen
-        },
-        rowId: id
-      };
-    }
+    const { rows, items } = this.prepareData();
 
     // LEFT SIDE LIST COLUMNS
 
@@ -87,12 +148,6 @@ export class AppComponent implements OnInit {
         items
       }
     };
-
-
-    setTimeout(() => {
-      this.config.list.rows[1].label = 'ROOOOW CHANGED';
-      this.config.list = { ...this.config.list };
-    }, 4000);
   }
 
   // GET THE GANTT INTERNAL STATE
@@ -121,25 +176,63 @@ export class AppComponent implements OnInit {
     );
   }
 
-  addItem() {
-    const id = Math.floor(Math.random() * 10000000).toString();
-    const dayLen = 24 * 60 * 60 * 1000;
-    const start = new Date().getTime();
-    this.config.chart = {
-      ...this.config.chart,
-      items: {
-        ...this.config.chart.items,
-        [id]: {
-          id,
-          label: 'User id ' + id,
-          time: {
-            start: start + 3 * dayLen,
-            end: start + 5 * dayLen
+  prepareData() {
+    const results = [];
+    const items = {};
+    MOCKED_DATA.forEach((property) => {
+      const id = `p${property.id}`;
+      const meta = ['Price per night', 'Minimum stay'];
+      results.push({
+        id,
+        label: property.name,
+        resizeable: false,
+        // moveable: false,
+        expanded: true,
+      });
+      meta.forEach((el, index) => {
+        results.push({
+          id: `${id}_m${index + 1}`,
+          label: el,
+          isMeta: true,
+          resizeable: false,
+          // moveable: false,
+          parentId: id,
+          style: {
+            current: `background: #fefefe;`,
           },
-          rowId: Math.floor(Math.random() * 20).toString()
+        });
+      });
+      property.units.forEach(unit => {
+        results.push({
+          id: `${id}_u${unit.id}`,
+          label: unit.name,
+          parentId: id,
+        });
+        if (unit.hasOwnProperty('bookings')) {
+          unit.bookings.forEach(booking => {
+            items[booking.id] = {
+              id: booking.id,
+              label: booking.name,
+              rowId: `${id}_u${unit.id}`,
+              moveable: true,
+              style: {
+                current: booking.color ? `background: ${booking.color};` : '',
+              },
+              time: {
+                start: booking.from,
+                end: booking.to,
+              }
+            };
+          });
         }
-      }
-    };
+      });
+    });
+
+    const rows = results.reduce((obj, item) => {
+      obj[item.id] = item;
+      return obj;
+    }, {});
+    return { rows, items };
   }
 
   listChange($event: any) {
@@ -152,5 +245,9 @@ export class AppComponent implements OnInit {
 
   itemClick($event: any) {
     console.log('itemClick', $event);
+  }
+
+  itemMoved(item: any) {
+    console.log('item MOVED', item);
   }
 }

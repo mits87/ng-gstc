@@ -30,7 +30,9 @@
             "styles": [
               "projects/ng-gstc-demo/src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [
+              "node_modules/dayjs/dayjs.min.js"
+            ]
           },
           "configurations": {
             "production": {

@@ -22,8 +22,11 @@ import {
   Slots,
   Wrappers
 } from 'gantt-schedule-timeline-calendar';
+import ItemMovement from 'gantt-schedule-timeline-calendar/dist/ItemMovement.plugin.js'
 import GSTC from 'gantt-schedule-timeline-calendar/dist/index.esm';
 import { Handler } from './ng-gstc';
+import { Observable, Subject } from 'rxjs';
+import { distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'ng-gstc',
@@ -60,9 +63,13 @@ export class NgGstcComponent implements AfterViewInit, OnChanges, OnDestroy {
   @Output() classNamesChange: EventEmitter<any> = new EventEmitter();
   @Output() actionsChange: EventEmitter<any> = new EventEmitter();
 
+  @Output() itemMoved: Observable<any>;
+
   @Output() itemClick: EventEmitter<any> = new EventEmitter();
 
   @ViewChild('gstc', { static: true }) calendarEl: ElementRef;
+
+  private itemMoved$: Subject<any> = new Subject<any>();
 
   private gstc: any;
   private state: any;
@@ -85,9 +92,45 @@ export class NgGstcComponent implements AfterViewInit, OnChanges, OnDestroy {
     'usageStatistics',
   ];
 
-  constructor() { }
+  constructor() {
+    this.itemMoved = this.itemMoved$
+      .pipe(distinctUntilChanged((old, current) => {
+        return old.rowId === current.rowId &&
+          old.time.start === current.time.start &&
+          old.time.end === current.time.end;
+      }));
+  }
 
   ngAfterViewInit(): void {
+    if (!this.plugins) {
+      this.plugins = [];
+    }
+
+    this.plugins.push(ItemMovement({
+      moveable: true,
+      resizable: true,
+      // resizerContent: '<div class="resizer">-></div>',
+      ghostNode: false,
+      // snap item start time to start of the day
+      snapStart: (time, diff, item) => {
+        return GSTC.api
+          .date(time)
+          .add(diff, 'milliseconds')
+          .startOf('day')
+          .valueOf();
+      },
+      // snap item end time to end of the day
+      snapEnd: (time, diff, item) => {
+        this.itemMoved$.next({ ...item, time: { ...item.time } });
+
+        return GSTC.api
+          .date(time)
+          .add(diff, 'milliseconds')
+          .endOf('day')
+          .valueOf();
+      }
+    }));
+
     this.init();
   }
 

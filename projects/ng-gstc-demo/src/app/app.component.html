@@ -5,10 +5,7 @@
     [chart]="config.chart"
     (listChange)="listChange($event)"
     (itemClick)="itemClick($event)"
+    (itemMoved)="itemMoved($event)"
     [customEventHandlers]="events"
   ></ng-gstc>
-</div>
-
-<div>
-  <button (click)="addItem()">Add Random Item</button>
 </div>
